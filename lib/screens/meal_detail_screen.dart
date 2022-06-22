@@ -3,8 +3,10 @@ import '../dummy_data.dart';
 
 class MealDetailScreen extends StatelessWidget {
   static const routeName = '/meal-detail';
+  final Function toggleFavorite;
+  final Function isFavorite;
 
-  const MealDetailScreen({Key? key}) : super(key: key);
+  MealDetailScreen(this.toggleFavorite, this.isFavorite);
 
   Widget buildSectionTitle(
       BuildContext context, String text, MediaQueryData mediaQuery) {
@@ -39,82 +41,103 @@ class MealDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     MediaQueryData mediaQuery = MediaQuery.of(context);
-    final mealId = ModalRoute.of(context)!.settings.arguments as String;
+    final List arguments = ModalRoute.of(context)!.settings.arguments as List;
+    final mealId = arguments[0] as String;
+    final from = arguments[1];
     final selectedMeal = dummyMeals.firstWhere((meal) => meal.id == mealId);
     return Scaffold(
-        appBar: AppBar(
-          title: Text('${selectedMeal.title}',
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5
-                  ?.copyWith(color: Colors.white)),
-        ),
-        body: SingleChildScrollView(
-          child: Flex(
-            direction: mediaQuery.orientation == Orientation.portrait
-                ? Axis.vertical
-                : Axis.horizontal,
-            mainAxisAlignment: mediaQuery.orientation == Orientation.portrait
-                ? MainAxisAlignment.start
-                : MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.3,
-                width: double.infinity,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                      mediaQuery.orientation == Orientation.landscape ? 10 : 0),
-                  child: Image.network(
-                    selectedMeal.imageUrl!,
-                    fit: BoxFit.cover,
-                  ),
+      appBar: AppBar(
+        title: Text('${selectedMeal.title}',
+            style: Theme.of(context)
+                .textTheme
+                .headline5
+                ?.copyWith(color: Colors.white)),
+      ),
+      body: SingleChildScrollView(
+        child: Flex(
+          direction: mediaQuery.orientation == Orientation.portrait
+              ? Axis.vertical
+              : Axis.horizontal,
+          mainAxisAlignment: mediaQuery.orientation == Orientation.portrait
+              ? MainAxisAlignment.start
+              : MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.3,
+              width: double.infinity,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(
+                    mediaQuery.orientation == Orientation.landscape ? 10 : 0),
+                child: Image.network(
+                  selectedMeal.imageUrl!,
+                  fit: BoxFit.cover,
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  buildSectionTitle(context, 'Ingredients', mediaQuery),
-                  buildListContainer(
-                      ListView.builder(
-                        itemBuilder: (ctx, index) {
-                          return Card(
-                            color: Theme.of(context).accentColor,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 10),
-                              child: Text(selectedMeal.ingredients![index]),
-                            ),
-                          );
-                        },
-                        itemCount: selectedMeal.ingredients!.length,
-                      ),
-                      mediaQuery),
-                  buildSectionTitle(context, 'Steps', mediaQuery),
-                  buildListContainer(
-                      ListView.builder(
-                        itemBuilder: (ctx, index) {
-                          return Column(
-                            children: <Widget>[
-                              ListTile(
-                                leading: CircleAvatar(
-                                  child: Text('# ${index + 1}'),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                buildSectionTitle(context, 'Ingredients', mediaQuery),
+                buildListContainer(
+                    ListView.builder(
+                      itemBuilder: (ctx, index) {
+                        return Card(
+                          color: Theme.of(context).colorScheme.secondary,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            child: Text(selectedMeal.ingredients![index]),
+                          ),
+                        );
+                      },
+                      itemCount: selectedMeal.ingredients!.length,
+                    ),
+                    mediaQuery),
+                buildSectionTitle(context, 'Steps', mediaQuery),
+                buildListContainer(
+                    ListView.builder(
+                      itemBuilder: (ctx, index) {
+                        return Column(
+                          children: <Widget>[
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    Color.fromRGBO(3, 122, 42, 1.0),
+                                child: Text(
+                                  '# ${index + 1}',
+                                  style: TextStyle(color: Colors.white),
                                 ),
-                                title: Text(selectedMeal.steps![index]),
                               ),
-                              const Divider(
-                                thickness: 0.9,
-                                color: Colors.black,
-                              )
-                            ],
-                          );
-                        },
-                        itemCount: selectedMeal.steps!.length,
-                      ),
-                      mediaQuery)
-                ],
-              )
-            ],
-          ),
-        ));
+                              title: Text(selectedMeal.steps![index]),
+                            ),
+                            const Divider(
+                              thickness: 0.9,
+                              color: Colors.black,
+                            )
+                          ],
+                        );
+                      },
+                      itemCount: selectedMeal.steps!.length,
+                    ),
+                    mediaQuery)
+              ],
+            )
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          isFavorite(mealId) ? Icons.star : Icons.star_border,
+        ),
+        onPressed: () {
+          // the next line is because ther former button was to delete it.
+          // Navigator.of(context).pop(mealId);
+          toggleFavorite(mealId);
+          if (from == 'favorites') {
+            Navigator.of(context).pop(mealId);
+          }
+        },
+      ),
+    );
   }
 }

@@ -28,7 +28,8 @@ class MainDrawer extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Container(
-            decoration: BoxDecoration(color: Theme.of(context).accentColor),
+            decoration:
+                BoxDecoration(color: Theme.of(context).colorScheme.secondary),
             height: 120,
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -38,17 +39,17 @@ class MainDrawer extends StatelessWidget {
               style: TextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 30,
-                  color: Theme.of(context).primaryColor),
+                  color: Theme.of(context).colorScheme.primary),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
           buildListTile('Meals', Icons.restaurant, () {
-            Navigator.of(context).pushNamed('/');
+            Navigator.of(context).pushReplacementNamed('/');
           }),
           buildListTile('Filters', Icons.settings, () {
-            Navigator.of(context).pushNamed(FiltersScreen.routeName);
+            Navigator.of(context).pushReplacementNamed(FiltersScreen.routeName);
           }),
         ],
       ),
